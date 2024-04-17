@@ -1,0 +1,265 @@
+openapi: 3.0.1
+info:
+  title: Todo-Listen-Verwaltung
+  description: ""
+  contact:
+    email: wichmann@bbs-os-brinkstr.de
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.1.0
+servers:
+- url: http://127.0.0.1:5000/
+tags:
+- name: Listenverwaltung
+paths:
+  /list/{list_id}:
+    get:
+      tags:
+      - Listenverwaltung
+      summary: Get all items from list
+      operationId: getList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List item returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoItem'
+        404:
+          description: Invalid list id
+          content: {}
+        429:
+          description: Too Many Requests
+          content: {}
+    patch:
+      tags:
+      - Listenverwaltung
+      summary: Update a list
+      operationId: updateList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoList'
+        404:
+          description: Invalid list id
+          content: {}
+        429:
+          description: Too Many Requests
+          content: {}
+    delete:
+      tags:
+      - Listenverwaltung
+      summary: Delete a list
+      operationId: deleteList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List was deleted
+          content: {}
+        404:
+          description: Invalid list id
+          content: {}
+        429:
+          description: Too Many Requests
+          content: {}
+  /list:
+    post:
+      tags:
+      - Listenverwaltung
+      summary: Add new list
+      operationId: addList
+      requestBody:
+        description: list object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoList'
+        required: true
+      responses:
+        200:
+          description: List added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoList'
+        429:
+          description: Too Many Requests
+          content: {}
+        500:
+          description: List could not be added
+          content: {}
+  /list/{list_id}/item:
+    post:
+      tags:
+        - Listenverwaltung
+      summary: Add new item to an existing list
+      operationId: addItem
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: item object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoItem'
+        required: true
+      responses:
+        200:
+          description: Item added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoItem'
+        404:
+          description: Invalid list id
+          content: {}
+        429:
+          description: Too Many Requests
+          content: {}
+  /list/{list_id}/item/{item_id}:
+    patch:
+      tags:
+        - Listenverwaltung
+      summary: Edit item of an existing list
+      operationId: patchItem
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      - name: item_id
+        in: path
+        description: item id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: item object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoItem'
+        required: true
+      responses:
+        200:
+          description: Item added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoItem'
+        404:
+          description: Invalid list id or Invalid item id
+          content: {}
+        429:
+          description: Too Many Requests
+          content: {}
+    delete:
+      tags:
+        - Listenverwaltung
+      summary: Delete item of an existing list
+      operationId: deleteItem
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      - name: item_id
+        in: path
+        description: item id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Item was deleted
+          content: {}
+        404:
+          description: Invalid list id or invalid item id
+          content: {}
+        429:
+          description: Too Many Requests
+          content: {}
+  /lists:
+    get:
+      tags:
+        - Listenverwaltung
+      summary: Get all existing lists
+      operationId: getLists
+      responses:
+        200:
+          description: List item returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoList'
+        429:
+          description: Too Many Requests
+          content: {}
+        500:
+          description: Internal Server Error
+          content: {}
+components:
+  schemas:
+    TodoList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+    TodoItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        list_id:
+          type: string
+          format: uuid
