@@ -1,4 +1,3 @@
-
 """
 Example script showing how to represent todo lists and todo entries in Python
 data structures and how to implement endpoint for a REST API with Flask.
@@ -8,9 +7,7 @@ Requirements:
 """
 
 import uuid 
-
 from flask import Flask, request, jsonify, abort
-
 
 # initialize Flask server
 app = Flask(__name__)
@@ -34,7 +31,7 @@ todos = [
     {'id': todo_1_id, 'name': 'Milch', 'description': '', 'list': todo_list_1_id},
     {'id': todo_2_id, 'name': 'Arbeitsblätter ausdrucken', 'description': '', 'list': todo_list_2_id},
     {'id': todo_3_id, 'name': 'Kinokarten kaufen', 'description': '', 'list': todo_list_3_id},
-    {'id': todo_3_id, 'name': 'Eier', 'description': '', 'list': todo_list_1_id},
+    {'id': todo_4_id, 'name': 'Eier', 'description': '', 'list': todo_list_1_id},
 ]
 
 # add some headers to allow cross origin access to the API on this server, necessary for using preview in Swagger Editor!
@@ -49,11 +46,7 @@ def apply_cors_header(response):
 @app.route('/list/<list_id>', methods=['GET', 'DELETE'])
 def handle_list(list_id):
     # find todo list depending on given list id
-    list_item = None
-    for l in todo_lists:
-        if l['id'] == list_id:
-            list_item = l
-            break
+    list_item = next((l for l in todo_lists if l['id'] == list_id), None)
     # if the given list id is invalid, return status code 404
     if not list_item:
         abort(404)
@@ -67,7 +60,6 @@ def handle_list(list_id):
         todo_lists.remove(list_item)
         return '', 200
 
-
 # define endpoint for adding a new list
 @app.route('/list', methods=['POST'])
 def add_new_list():
@@ -75,16 +67,41 @@ def add_new_list():
     new_list = request.get_json(force=True)
     print('Got new list to be added: {}'.format(new_list))
     # create id for new list, save it and return the list with id
-    new_list['id'] = uuid.uuid4()
+    new_list['id'] = str(uuid.uuid4())
     todo_lists.append(new_list)
     return jsonify(new_list), 200
-
 
 # define endpoint for getting all lists
 @app.route('/lists', methods=['GET'])
 def get_all_lists():
     return jsonify(todo_lists)
 
+# define endpoint for getting a single todo item
+@app.route('/list/<list_id>/item/<item_id>', methods=['GET'])
+def get_todo_item(list_id, item_id):
+    item = next((i for i in todos if i['list'] == list_id and str(i['id']) == item_id), None)
+    if not item:
+        abort(404)
+    return jsonify(item)
+
+# define endpoint for deleting a single todo item
+@app.route('/list/<list_id>/item/<item_id>', methods=['DELETE'])
+def delete_todo_item(list_id, item_id):
+    item = next((i for i in todos if i['list'] == list_id and str(i['id']) == item_id), None)
+    if not item:
+        abort(404)
+    todos.remove(item)
+    return '', 200
+
+# define endpoint for adding a new todo item to a list
+@app.route('/list/<list_id>/item', methods=['POST'])
+def add_todo_item(list_id):
+    new_item = request.get_json(force=True)
+    print('Got new todo item to be added: {}'.format(new_item))
+    new_item['id'] = str(uuid.uuid4())
+    new_item['list'] = list_id
+    todos.append(new_item)
+    return jsonify(new_item), 200
 
 if __name__ == '__main__':
     # start Flask server

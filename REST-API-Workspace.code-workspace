@@ -1,7 +1,23 @@
 {
 	"folders": [
 		{
+			"name": "REST-API",
 			"path": "."
+		},
+		{
+			"name": "Berichte",
+			"path": "../../../../Users/friederike.lentge/OneDrive - Thomas Philipps GmbH & Co. KG/Berichte"
+		},
+		{
+			"name": "MDE",
+			"path": "../../../MDE"
+		},
+		{
+			"name": "Sonstiges",
+			"path": "../../../../Users/friederike.lentge/OneDrive - Thomas Philipps GmbH & Co. KG/Sonstiges"
+		},
+		{
+			"path": "../../../../Users/friederike.lentge/source/repos/feleax"
 		}
 	]
 }
